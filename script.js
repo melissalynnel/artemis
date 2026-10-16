@@ -33,17 +33,6 @@ window.addEventListener("pointermove", handlePointerMove);
 window.addEventListener("touchstart", handleTouchMove, { passive: true });
 window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
-window.addEventListener(
-  "touchmove",
-  (event) => {
-    if (window.innerWidth > 900) return;
-    const scroller = event.target?.closest?.(".toolkit-scroller");
-    if (scroller) return;
-    event.preventDefault();
-  },
-  { passive: false }
-);
-
 const positions = Array.from({ length: cursorTrails.length + 1 }).map(() => ({
   x: pointer.x,
   y: pointer.y,
@@ -66,11 +55,6 @@ const animate = () => {
     el.style.transform = `translate(${positions[index + 1].x}px, ${positions[index + 1].y}px)`;
   });
 
-  if (orbitRotation !== lastOrbitRotation) {
-    lastOrbitRotation = orbitRotation;
-    updateTooltipAnchors();
-  }
-
   requestAnimationFrame(animate);
 };
 
@@ -80,7 +64,6 @@ const orbit = document.querySelector(".orbit");
 const iconNodes = Array.from(document.querySelectorAll(".icon-node"));
 let orbitRotation = 0;
 let anchorFrame = null;
-let lastOrbitRotation = orbitRotation;
 let orbitTweenFrame = null;
 
 const updateOrbit = () => {
@@ -146,20 +129,6 @@ const updateTooltipAnchors = () => {
     const distance = Math.hypot(dx, dy) || 1;
     const normX = dx / distance;
     const normY = dy / distance;
-    const dominantAxis = Math.abs(dx) >= Math.abs(dy) ? "x" : "y";
-    const direction =
-      dominantAxis === "x"
-        ? dx >= 0
-          ? "right"
-          : "left"
-        : dy >= 0
-          ? "bottom"
-          : "top";
-
-    node.classList.toggle("tooltip-right", direction === "right");
-    node.classList.toggle("tooltip-left", direction === "left");
-    node.classList.toggle("tooltip-top", direction === "top");
-    node.classList.toggle("tooltip-bottom", direction === "bottom");
     node.style.setProperty("--tip-x", `${normX}`);
     node.style.setProperty("--tip-y", `${normY}`);
     node.style.setProperty("--tip-origin-x", `${nodeCenterX - (nodeRect.left + nodeRect.width / 2)}px`);
@@ -187,40 +156,29 @@ const placeNodes = () => {
     const dot = node.querySelector(".icon-dot");
     const angle = -Math.PI / 2 + index * step;
     const x = centerX + Math.cos(angle) * radius;
-    let y = centerY + Math.sin(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius;
     node.style.left = `${x}px`;
     node.style.top = `${y}px`;
     node.style.transform = "translate(-50%, -50%)";
 
-    // Align the actual dot center to the computed ring center.
+    // Shift the node so its dot (not the node's box) sits on the ring.
     if (dot) {
       const nodeRect = node.getBoundingClientRect();
       const dotRect = dot.getBoundingClientRect();
-      const nodeCenterX = nodeRect.left + nodeRect.width / 2;
-      const nodeCenterY = nodeRect.top + nodeRect.height / 2;
-      const dotCenterX = dotRect.left + dotRect.width / 2;
-      const dotCenterY = dotRect.top + dotRect.height / 2;
-      const dotOffsetX = dotCenterX - nodeCenterX;
-      const dotOffsetY = dotCenterY - nodeCenterY;
-      if (dotOffsetX !== 0) {
-        node.style.left = `${x - dotOffsetX}px`;
-      }
-      if (dotOffsetY !== 0) {
-        node.style.top = `${y - dotOffsetY}px`;
-      }
+      const dotOffsetX = dotRect.left + dotRect.width / 2 - (nodeRect.left + nodeRect.width / 2);
+      const dotOffsetY = dotRect.top + dotRect.height / 2 - (nodeRect.top + nodeRect.height / 2);
+      node.style.left = `${x - dotOffsetX}px`;
+      node.style.top = `${y - dotOffsetY}px`;
     }
   });
   scheduleAnchorUpdate();
 };
 
-let isHoveringTechPanel = false;
-
 const handleWheel = (event) => {
   if (window.innerWidth <= 900) return;
-  if (isHoveringTechPanel) return;
-  if (document.querySelector(".project-modal.is-open")) {
-    return;
-  }
+  // Let scrollable panels and open project modals scroll normally instead of spinning the orbit.
+  if (event.target.closest(".tech-panel, .about-panel")) return;
+  if (document.querySelector(".project-modal.is-open")) return;
   event.preventDefault();
   stopOrbitTween();
   const delta = event.deltaX - event.deltaY;
@@ -357,13 +315,13 @@ const viewData = {
       id: "primitive",
       label: "Head of Communications\n2022",
       company: "Primitive",
-      tip: "Head of Communications\nRemote\nMay 2022–Dec 2022\n• Shaped GTM storytelling supporting a $9M fundraise\n• Increased media visibility by 100%\n• Coordinated launch ops contributing to 1.7M TVL",
+      tip: "Head of Communications\nRemote\nMar 2022–Dec 2022\n• Shaped GTM storytelling supporting a $9M fundraise\n• Increased media visibility by 100%\n• Coordinated launch ops contributing to 1.7M TVL",
     },
     {
       id: "consultant",
       label: "Founder & GTM Consultant\n2023–Now",
       company: "Self-employed",
-      tip: "Founder & GTM Consultant\nDenver, CO\nJan 2023–Present\n• Built GTM + operational systems for early-stage founders\n• Playbooks improved outreach efficiency by 66%\n• Reduced manual coordination by 35% across workflows",
+      tip: "Founder & GTM Consultant\nSan Francisco, CA\nJan 2023–Present\n• Built GTM + operational systems for early-stage founders\n• Playbooks improved outreach efficiency by 66%\n• Reduced manual coordination by 35% across workflows",
     },
     {
       id: "live-laugh-colorado",
@@ -380,60 +338,55 @@ const viewData = {
   ],
 };
 
-const getRoleMetaFromLabel = (entry, fallbackLabel = "") => {
-  const labelLines = (entry.label || fallbackLabel)
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+const toLines = (text = "") => text.split("\n").map((line) => line.trim()).filter(Boolean);
+
+const getBullets = (tip) =>
+  toLines(tip)
+    .filter((line) => line.startsWith("•"))
+    .map((line) => `• ${line.replace(/^•\s*/, "")}`);
+
+// A role's label holds the title lines plus a year line; the company and year form the meta line.
+const getRoleParts = (entry) => {
+  const labelLines = toLines(entry.label);
   const yearLine = labelLines.find((line) => /\b(19|20)\d{2}\b/.test(line)) || "";
-  const roleText = labelLines.filter((line) => line !== yearLine).join(" ");
-  const metaLine = [entry.company || "", yearLine].filter(Boolean).join(" | ");
-  return { roleText, metaLine };
+  return {
+    roleText: labelLines.filter((line) => line !== yearLine).join(" "),
+    metaLine: [entry.company, yearLine].filter(Boolean).join(" | "),
+    bullets: getBullets(entry.tip),
+  };
 };
 
-const buildRoleTip = (entry, fallbackLabel = "") => {
-  const { roleText, metaLine } = getRoleMetaFromLabel(entry, fallbackLabel);
-  const bulletLines = (entry.tip || "")
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith("•"))
-    .map((line) => line.replace(/^•\s*/, "").trim())
-    .filter(Boolean)
-    .map((line) => `• ${line}`);
-
-  return [roleText, metaLine, ...bulletLines]
-    .filter(Boolean)
-    .join("\n")
-    .replace(/\n{2,}/g, "\n")
-    .trim();
+const buildRoleTip = (entry) => {
+  const { roleText, metaLine, bullets } = getRoleParts(entry);
+  return [roleText, metaLine, ...bullets].filter(Boolean).join("\n");
 };
 
 const toggleButtons = Array.from(document.querySelectorAll(".toggle-btn"));
-const mobileToolkit = document.querySelector(".mobile-toolkit");
 const toolkitScroller = document.querySelector(".toolkit-scroller");
 const toolkitCards = [];
 let activeNodeIndex = 7;
 let currentViewKey = "area";
 
+const highlightNode = (index) => {
+  activeNodeIndex = index;
+  iconNodes.forEach((node, nodeIndex) => {
+    node.classList.toggle("is-selected", nodeIndex === index);
+  });
+  toolkitCards.forEach((card, cardIndex) => {
+    card.classList.toggle("is-active", cardIndex === index);
+  });
+};
+
 const setActiveNode = (index, { scrollToolkit = false, animateRotation = false } = {}) => {
   if (!iconNodes.length) return;
   const total = iconNodes.length;
-  activeNodeIndex = ((index % total) + total) % total;
-  iconNodes.forEach((node, nodeIndex) => {
-    node.classList.toggle("is-selected", nodeIndex === activeNodeIndex);
-  });
-  toolkitCards.forEach((card, cardIndex) => {
-    card.classList.toggle("is-active", cardIndex === activeNodeIndex);
-  });
+  highlightNode(((index % total) + total) % total);
   if (scrollToolkit && toolkitCards[activeNodeIndex]) {
     toolkitCards[activeNodeIndex].scrollIntoView({
       behavior: "smooth",
       inline: "center",
       block: "nearest",
     });
-  }
-  if (mobileToolkit) {
-    mobileToolkit.classList.add("is-active");
   }
   const step = 360 / total;
   const targetRotation = -activeNodeIndex * step;
@@ -446,105 +399,53 @@ const setActiveNode = (index, { scrollToolkit = false, animateRotation = false }
   updateOrbit();
 };
 
-const syncToolkitCards = () => {
-  if (!toolkitScroller) return;
-  if (toolkitCards.length === 0) {
-    toolkitScroller.innerHTML = "";
-    iconNodes.forEach((node, index) => {
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = "toolkit-card";
-      const title = document.createElement("span");
-      title.className = "toolkit-title";
-      const body = document.createElement("span");
-      body.className = "toolkit-body";
-      card.appendChild(title);
-      card.appendChild(body);
-      card.addEventListener("click", () => {
-        setActiveNode(index, { scrollToolkit: true, animateRotation: window.innerWidth <= 900 });
-      });
-      toolkitScroller.appendChild(card);
-      toolkitCards.push(card);
-    });
-  }
-
-  const viewEntries = viewData[currentViewKey] || [];
-
+// Mobile cards mirror the orbit nodes: one card per node, created once and refilled per view.
+if (toolkitScroller) {
   iconNodes.forEach((node, index) => {
-    const label = node.querySelector(".icon-label")?.textContent || "";
-    const tip = node.getAttribute("data-tip") || "";
-    const entry = viewEntries[index % viewEntries.length] || {};
-    const card = toolkitCards[index];
-    if (!card) return;
-    card.dataset.view = currentViewKey;
-    if (entry.id) {
-      card.dataset.role = entry.id;
-    } else {
-      delete card.dataset.role;
-    }
-    const title = card.querySelector(".toolkit-title");
-    const body = card.querySelector(".toolkit-body");
-    if (body) {
-      const tipLines = tip.split("\n").map((line) => line.trim()).filter(Boolean);
-      const bulletStart = tipLines.findIndex((line) => line.startsWith("•"));
-      const bullets = bulletStart >= 0 ? tipLines.slice(bulletStart) : [];
-
-      if (currentViewKey === "role") {
-        const labelLines = (entry.label || label)
-          .split("\n")
-          .map((line) => line.trim())
-          .filter(Boolean);
-        const yearLine =
-          labelLines.find((line) => /\b(19|20)\d{2}\b/.test(line)) || "";
-        const roleLines = labelLines.filter((line) => line !== yearLine);
-        const roleText = roleLines.join(" ");
-        const metaLine = [entry.company || "", yearLine].filter(Boolean).join(" | ");
-        const bulletLines = bullets
-          .map((line) => line.replace(/^•\s*/, "").trim())
-          .filter(Boolean)
-          .map((line) => `• ${line}`);
-        if (title) title.textContent = roleText || label.replace(/\s*\n\s*/g, " ");
-        body.textContent = [metaLine, ...bulletLines]
-          .filter(Boolean)
-          .join("\n")
-          .replace(/\n{2,}/g, "\n")
-          .trim();
-      } else {
-        if (title) title.textContent = label.replace(/\s*\n\s*/g, " ");
-        body.textContent = bullets
-          .map((line) => line.replace(/^•\s*/, "").trim())
-          .filter(Boolean)
-          .map((line) => `• ${line}`)
-          .join("\n")
-          .replace(/\n{2,}/g, "\n")
-          .trim();
-      }
-    }
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "toolkit-card";
+    card.innerHTML = '<span class="toolkit-title"></span><span class="toolkit-body"></span>';
+    card.addEventListener("click", () => {
+      setActiveNode(index, { scrollToolkit: true, animateRotation: window.innerWidth <= 900 });
+    });
+    toolkitScroller.appendChild(card);
+    toolkitCards.push(card);
   });
+}
 
-  setActiveNode(activeNodeIndex, { scrollToolkit: true });
+const fillToolkitCard = (card, entry) => {
+  card.dataset.view = currentViewKey;
+  let title = entry.label.replace(/\s*\n\s*/g, " ");
+  let body = getBullets(entry.tip).join("\n");
+  if (currentViewKey === "role") {
+    const { roleText, metaLine, bullets } = getRoleParts(entry);
+    title = roleText;
+    body = [metaLine, ...bullets].filter(Boolean).join("\n");
+  }
+  card.querySelector(".toolkit-title").textContent = title;
+  card.querySelector(".toolkit-body").textContent = body;
 };
 
 const applyView = (viewKey) => {
   const data = viewData[viewKey];
   if (!data) return;
+  currentViewKey = viewKey;
   iconNodes.forEach((node, index) => {
     const entry = data[index % data.length];
-    const label = node.querySelector(".icon-label");
-    if (label) label.textContent = entry.label;
-    const tip = viewKey === "role" ? buildRoleTip(entry, entry.label) : entry.tip;
-    node.setAttribute("data-tip", tip);
+    node.querySelector(".icon-label").textContent = entry.label;
+    node.setAttribute("data-tip", viewKey === "role" ? buildRoleTip(entry) : entry.tip);
     node.setAttribute("data-nowrap", entry.nowrap ? "true" : "false");
+    if (toolkitCards[index]) fillToolkitCard(toolkitCards[index], entry);
   });
-  syncToolkitCards();
+  setActiveNode(activeNodeIndex, { scrollToolkit: true });
 };
 
 const setActiveToggle = (viewKey) => {
-  currentViewKey = viewKey;
   toggleButtons.forEach((btn) => {
     const isActive = btn.dataset.view === viewKey;
     btn.classList.toggle("is-active", isActive);
-    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+    btn.setAttribute("aria-pressed", String(isActive));
   });
   applyView(viewKey);
 };
@@ -590,14 +491,8 @@ if (toolkitScroller) {
         }
       });
       if (window.innerWidth <= 900) {
-        activeNodeIndex = closestIndex;
-        iconNodes.forEach((node, nodeIndex) => {
-          node.classList.toggle("is-selected", nodeIndex === activeNodeIndex);
-        });
-        toolkitCards.forEach((card, cardIndex) => {
-          card.classList.toggle("is-active", cardIndex === activeNodeIndex);
-        });
-
+        // Rotate the orbit continuously with the scroll position rather than snapping per card.
+        highlightNode(closestIndex);
         const firstCard = toolkitCards[0];
         if (firstCard) {
           const scrollerStyle = getComputedStyle(toolkitScroller);
@@ -616,20 +511,10 @@ if (toolkitScroller) {
   });
 }
 
-const techPanel = document.querySelector(".tech-panel");
-const techToggle = document.querySelector(".tech-toggle");
-const techGrid = document.querySelector(".tech-grid");
-const projectsPanel = document.querySelector(".projects-panel");
-const projectsToggle = document.querySelector(".projects-toggle");
-const projectsGrid = document.querySelector(".projects-grid");
-const mobileIcons = Array.from(document.querySelectorAll(".mobile-icon"));
-const mobilePanels = Array.from(document.querySelectorAll("[data-mobile-panel]"));
 const bubbleSound = typeof Audio !== "undefined" ? new Audio("assets/audio/bubble.wav") : null;
 if (bubbleSound) {
   bubbleSound.volume = 0.4;
 }
-let isTouchScrolling = false;
-let scrollResetTimer = null;
 
 const playBubble = () => {
   if (!bubbleSound) return;
@@ -637,257 +522,104 @@ const playBubble = () => {
   bubbleSound.play().catch(() => {});
 };
 
-const triggerBob = (el) => {
-  if (!el) return;
-  el.classList.remove("is-bob");
-  void el.offsetWidth;
-  el.classList.add("is-bob");
+// Corner panels. On desktop, Tech Stack and About expand in place (.is-open); on mobile, the
+// corner buttons show one panel at a time (.is-mobile-open).
+const mobileIcons = Array.from(document.querySelectorAll(".mobile-icon[data-target]"));
+const mobilePanels = Array.from(document.querySelectorAll("[data-mobile-panel]"));
+const collapsiblePanels = [
+  [".tech-panel", ".tech-toggle", ".tech-grid"],
+  [".about-panel", ".about-toggle", ".about-body"],
+]
+  .map(([panel, toggle, content]) => ({
+    panel: document.querySelector(panel),
+    toggle: document.querySelector(toggle),
+    content: document.querySelector(content),
+  }))
+  .filter(({ panel, toggle, content }) => panel && toggle && content);
+
+const isPanelOpen = (panel) =>
+  panel.classList.contains("is-open") || panel.classList.contains("is-mobile-open");
+
+// Single place that keeps ARIA state (and scroll reset) in step with the panel classes.
+const syncPanelAria = () => {
+  collapsiblePanels.forEach(({ panel, toggle, content }) => {
+    const open = isPanelOpen(panel);
+    toggle.setAttribute("aria-expanded", String(open));
+    content.setAttribute("aria-hidden", String(!open));
+    if (!open) panel.scrollTop = 0;
+  });
+  mobileIcons.forEach((icon) => {
+    const panel = mobilePanels.find((item) => item.dataset.mobilePanel === icon.dataset.target);
+    icon.setAttribute("aria-expanded", String(Boolean(panel?.classList.contains("is-mobile-open"))));
+  });
 };
 
-if (techPanel && techToggle) {
-  techToggle.addEventListener("click", () => {
-    playBubble();
-    const isOpen = techPanel.classList.toggle("is-open");
-    techPanel.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    if (techGrid) {
-      techGrid.setAttribute("aria-hidden", isOpen ? "false" : "true");
-    }
-    if (!isOpen) {
-      techPanel.scrollTop = 0;
-    }
-  });
-
-  techPanel.addEventListener("mouseenter", () => {
-    isHoveringTechPanel = true;
-    techPanel.classList.add("is-hovering");
-  });
-
-  techPanel.addEventListener("mouseleave", () => {
-    isHoveringTechPanel = false;
-    techPanel.classList.remove("is-hovering");
-  });
-}
-
-if (projectsPanel && projectsToggle) {
-  projectsToggle.addEventListener("click", () => {
-    playBubble();
-    const isOpen = projectsPanel.classList.toggle("is-open");
-    projectsPanel.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    if (projectsGrid) {
-      projectsGrid.setAttribute("aria-hidden", isOpen ? "false" : "true");
-    }
-  });
-}
-
 const closeDesktopPanels = () => {
-  if (techPanel) {
-    techPanel.classList.remove("is-open");
-    techPanel.setAttribute("aria-expanded", "false");
-    techPanel.scrollTop = 0;
-  }
-  if (techGrid) {
-    techGrid.setAttribute("aria-hidden", "true");
-  }
-  if (projectsPanel) {
-    projectsPanel.classList.remove("is-open");
-    projectsPanel.setAttribute("aria-expanded", "false");
-  }
-  if (projectsGrid) {
-    projectsGrid.setAttribute("aria-hidden", "true");
-  }
+  collapsiblePanels.forEach(({ panel }) => panel.classList.remove("is-open"));
+  syncPanelAria();
 };
 
 const closeMobilePanels = () => {
-  mobilePanels.forEach((panel) => {
-    panel.classList.remove("is-mobile-open");
+  mobilePanels.forEach((panel) => panel.classList.remove("is-mobile-open"));
+  syncPanelAria();
+};
+
+collapsiblePanels.forEach(({ panel, toggle }) => {
+  toggle.addEventListener("click", () => {
+    playBubble();
+    panel.classList.toggle("is-open");
+    syncPanelAria();
   });
-  if (techPanel) {
-    techPanel.setAttribute("aria-expanded", "false");
-    techPanel.scrollTop = 0;
-  }
-  if (techGrid) {
-    techGrid.setAttribute("aria-hidden", "true");
-  }
-  if (projectsPanel) {
-    projectsPanel.setAttribute("aria-expanded", "false");
-  }
-  if (projectsGrid) {
-    projectsGrid.setAttribute("aria-hidden", "true");
-  }
-};
-
-const closeToolkit = () => {
-  if (mobileToolkit) {
-    mobileToolkit.classList.add("is-active");
-  }
-};
-
-const syncPanelsForViewport = () => {
-  if (window.innerWidth > 900) {
-    closeMobilePanels();
-  }
-};
-
-window.addEventListener("resize", syncPanelsForViewport);
-syncPanelsForViewport();
-
-const markScrolling = () => {
-  isTouchScrolling = true;
-  if (scrollResetTimer) {
-    clearTimeout(scrollResetTimer);
-  }
-  scrollResetTimer = setTimeout(() => {
-    isTouchScrolling = false;
-  }, 160);
-};
+});
 
 mobileIcons.forEach((icon) => {
   icon.addEventListener("click", () => {
     playBubble();
-    triggerBob(icon);
-    const target = icon.dataset.target;
-    if (!target) return;
-    const panel = mobilePanels.find((item) => item.dataset.mobilePanel === target);
+    const panel = mobilePanels.find((item) => item.dataset.mobilePanel === icon.dataset.target);
     if (!panel) return;
-    const isOpen = panel.classList.contains("is-mobile-open");
+    const wasOpen = panel.classList.contains("is-mobile-open");
     closeMobilePanels();
-    if (!isOpen) {
-      panel.classList.add("is-mobile-open");
-      if (target === "tech" && techPanel) {
-        techPanel.setAttribute("aria-expanded", "true");
-        if (techGrid) {
-          techGrid.setAttribute("aria-hidden", "false");
-        }
-      }
-      if (target === "projects" && projectsPanel) {
-        projectsPanel.setAttribute("aria-expanded", "true");
-        if (projectsGrid) {
-          projectsGrid.setAttribute("aria-hidden", "false");
-        }
-      }
-    }
+    if (!wasOpen) panel.classList.add("is-mobile-open");
+    syncPanelAria();
   });
 });
 
-mobilePanels.forEach((panel) => {
-  panel.addEventListener("touchmove", markScrolling, { passive: true });
-  panel.addEventListener("touchend", markScrolling, { passive: true });
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 900) closeMobilePanels();
 });
+syncPanelAria();
 
-if (mobileToolkit) {
-  mobileToolkit.addEventListener("touchmove", markScrolling, { passive: true });
-  mobileToolkit.addEventListener("touchend", markScrolling, { passive: true });
-}
-
-if (toolkitScroller) {
-  toolkitScroller.addEventListener("touchmove", markScrolling, { passive: true });
-  toolkitScroller.addEventListener("touchend", markScrolling, { passive: true });
-}
-
-const handleOutsideClose = (event) => {
-  if (window.innerWidth > 900) return;
-  if (isTouchScrolling) return;
+// Clicks (taps fire click too) outside the panels close them; clicks inside leave them open.
+document.addEventListener("click", (event) => {
   const target = event.target;
-  if (target.closest(".mobile-icon")) return;
-  closeMobilePanels();
-  closeToolkit();
-};
-
-document.addEventListener("click", handleOutsideClose);
-document.addEventListener("touchend", handleOutsideClose);
-
-const handleDesktopPanelClose = (event) => {
-  if (window.innerWidth <= 900) return;
-  const target = event.target;
-  if (target.closest(".tech-panel")) return;
-  if (target.closest(".projects-panel")) return;
-  if (target.closest(".tech-toggle")) return;
-  if (target.closest(".projects-toggle")) return;
-  closeDesktopPanels();
-};
-
-document.addEventListener("click", handleDesktopPanelClose);
-
-const techLogos = Array.from(document.querySelectorAll(".tech-item img"));
-
-const makeInitials = (text) => {
-  if (!text) return "★";
-  const cleaned = text.replace(/logo/i, "").trim();
-  if (cleaned.includes("+")) {
-    const parts = cleaned.split("+").map((part) => part.trim()).filter(Boolean);
-    if (parts.length >= 2) {
-      return `${parts[0][0] || ""}+${parts[1][0] || ""}`.toUpperCase();
-    }
+  if (window.innerWidth <= 900) {
+    if (target.closest("[data-mobile-panel], .mobile-icon")) return;
+    closeMobilePanels();
+    return;
   }
-  const ignore = new Set(["and", "of", "the", "suite", "business", "ads", "pro", "com"]);
-  const words = cleaned.replace(/[^a-z0-9 ]/gi, " ").trim().split(/\s+/);
-  const filtered = words.filter((word) => word && !ignore.has(word.toLowerCase()));
-  const target = filtered.length ? filtered : words;
-  if (target.length === 0) return "★";
-  if (target.length === 1) return target[0].slice(0, 2).toUpperCase();
-  return `${target[0][0]}${target[1][0]}`.toUpperCase();
-};
-
-const createFallbackSvg = (label) => {
-  const initials = makeInitials(label);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ff8bd7"/>
-      <stop offset="100%" stop-color="#7b6dff"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="\"Avenir Next\", \"Helvetica Neue\", Arial, sans-serif" font-size="22" fill="white" letter-spacing="1">${initials}</text>
-  </svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-};
-
-techLogos.forEach((logo) => {
-  logo.referrerPolicy = "no-referrer";
-  const label =
-    logo.alt ||
-    logo.closest(".tech-item")?.querySelector("span")?.textContent ||
-    "";
-  const handleError = () => {
-    if (logo.dataset.fallbackApplied) return;
-    logo.dataset.fallbackApplied = "true";
-    logo.src = createFallbackSvg(label);
-  };
-  logo.addEventListener("error", handleError);
+  if (target.closest(".tech-panel, .about-panel")) return;
+  closeDesktopPanels();
 });
 
 const projectModals = Array.from(document.querySelectorAll(".project-modal"));
 const projectCloseButtons = Array.from(document.querySelectorAll(".project-close"));
 const projectBackdrops = Array.from(document.querySelectorAll(".project-backdrop"));
-const projectTriggers = Array.from(document.querySelectorAll(".impact-link"));
-const projectWidgets = Array.from(document.querySelectorAll(".projects-item[data-project]"));
 
 const closeProject = () => {
   projectModals.forEach((modal) => {
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
   });
+  hideNodePopovers();
 };
 
-const openProject = (projectKey, controlId) => {
-  let modal = null;
-  if (projectKey) {
-    modal = projectModals.find((item) => item.dataset.project === projectKey) || null;
-  }
-  if (!modal && controlId) {
-    modal = document.getElementById(controlId);
-  }
-  if (!modal && projectModals.length) {
-    modal = projectModals[0];
-  }
+const openProject = (projectKey) => {
+  const modal = projectModals.find((item) => item.dataset.project === projectKey);
   if (!modal) return;
   closeProject();
   modal.classList.add("is-open");
   modal.setAttribute("aria-hidden", "false");
 };
-
-window.openProjectModal = openProject;
 
 window.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
@@ -897,101 +629,62 @@ window.addEventListener("keydown", (event) => {
 });
 
 const roadmapNodes = Array.from(document.querySelectorAll(".roadmap-node"));
-const nodePopovers = new WeakMap();
+const POPOVER_GAP = 12;
+const VIEWPORT_MARGIN = 16;
+
+const hideNodePopovers = () => {
+  document.querySelectorAll(".node-popover.is-visible").forEach((popover) => {
+    popover.classList.remove("is-visible");
+  });
+};
+
+// Place the popover below or above its board, whichever has more room, and shrink the
+// screenshots to fit that space so the popover never covers the board (or the cursor on it).
+const positionPopover = (popover, anchor) => {
+  const anchorRect = anchor.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - anchorRect.bottom - POPOVER_GAP - VIEWPORT_MARGIN;
+  const spaceAbove = anchorRect.top - POPOVER_GAP - VIEWPORT_MARGIN;
+  const placeBelow = spaceBelow >= spaceAbove;
+  const available = Math.max(spaceBelow, spaceAbove);
+
+  popover.style.removeProperty("--popover-img-max");
+  const grid = popover.querySelector(".node-popover-grid");
+  if (grid && popover.offsetHeight > available) {
+    const textHeight = popover.offsetHeight - grid.offsetHeight;
+    popover.style.setProperty("--popover-img-max", `${Math.max(60, available - textHeight)}px`);
+  }
+
+  const { width, height } = popover.getBoundingClientRect();
+  const top = placeBelow ? anchorRect.bottom + POPOVER_GAP : anchorRect.top - POPOVER_GAP - height;
+  const left = clamp(
+    anchorRect.left + anchorRect.width / 2 - width / 2,
+    VIEWPORT_MARGIN,
+    window.innerWidth - width - VIEWPORT_MARGIN
+  );
+  popover.style.left = `${left}px`;
+  popover.style.top = `${top}px`;
+};
+
 roadmapNodes.forEach((node) => {
+  const anchor = node.querySelector(".main-node");
   const popover = node.querySelector(".node-popover");
-  if (popover) {
-    nodePopovers.set(node, popover);
-  }
+  if (!anchor || !popover) return;
 
-  const button = node.querySelector(".main-node");
-  if (button) {
-    button.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const isExpanded = node.classList.contains("is-expanded");
-      roadmapNodes.forEach((item) => {
-        item.classList.remove("is-expanded");
-        const itemPopover = nodePopovers.get(item);
-        if (itemPopover) {
-          itemPopover.classList.remove("is-expanded");
-        }
-      });
-      if (!isExpanded) {
-        node.classList.add("is-expanded");
-        const activePopover = nodePopovers.get(node);
-        if (activePopover) {
-          const rect = node.getBoundingClientRect();
-          activePopover.style.left = `${rect.left + rect.width / 2}px`;
-          activePopover.style.top = `${rect.top + rect.height + 12}px`;
-          activePopover.classList.add("is-expanded");
-          activePopover.classList.add("is-visible");
-        }
-      }
-    });
-  }
+  // Fixed-position popovers live on <body> so the modal's scrolling pane can't clip them.
+  document.body.appendChild(popover);
 
-  const close = node.querySelector(".node-popover-close");
-  if (close) {
-    close.addEventListener("click", (event) => {
-      event.stopPropagation();
-      node.classList.remove("is-expanded");
-      const activePopover = nodePopovers.get(node);
-      if (activePopover) {
-        activePopover.classList.remove("is-expanded");
-        activePopover.classList.remove("is-visible");
-      }
-    });
-  }
+  // The popover is a non-interactive preview, so it never blocks hovering the other boards.
+  const show = () => {
+    hideNodePopovers();
+    positionPopover(popover, anchor);
+    popover.classList.add("is-visible");
+  };
+  const hide = () => popover.classList.remove("is-visible");
 
-  if (popover) {
-    if (!popover.dataset.portal) {
-      popover.dataset.portal = "true";
-      document.body.appendChild(popover);
-    }
-
-    let overNode = false;
-    let overPopover = false;
-
-    const position = () => {
-      const rect = node.getBoundingClientRect();
-      popover.style.left = `${rect.left + rect.width / 2}px`;
-      popover.style.top = `${rect.top + rect.height + 12}px`;
-    };
-
-    const show = () => {
-      position();
-      popover.classList.add("is-visible");
-      if (node.classList.contains("is-expanded")) {
-        popover.classList.add("is-expanded");
-      } else {
-        popover.classList.remove("is-expanded");
-      }
-    };
-
-    const hide = () => {
-      if (node.classList.contains("is-expanded") || overNode || overPopover) {
-        return;
-      }
-      popover.classList.remove("is-visible");
-    };
-
-    node.addEventListener("mouseenter", () => {
-      overNode = true;
-      show();
-    });
-    node.addEventListener("mouseleave", () => {
-      overNode = false;
-      hide();
-    });
-    popover.addEventListener("mouseenter", () => {
-      overPopover = true;
-      show();
-    });
-    popover.addEventListener("mouseleave", () => {
-      overPopover = false;
-      hide();
-    });
-  }
+  node.addEventListener("mouseenter", show);
+  node.addEventListener("mouseleave", hide);
+  anchor.addEventListener("focus", show);
+  anchor.addEventListener("blur", hide);
 });
 
 const roadmap = document.querySelector(".roadmap");
@@ -1011,8 +704,6 @@ const createNode = (el, type, opts = {}) => {
     vy: 0,
     radius: type === "main" ? 42 : 24,
     fixed: false,
-    baseX: opts.x || 0,
-    baseY: opts.y || 0,
   };
   graphNodes.push(node);
   nodeByElement.set(el, node);
@@ -1029,8 +720,6 @@ if (roadmap) {
   const centerX = rect.width / 2;
   const startY = 140;
   const stepY = 210;
-  const totalHeight = startY + (roadmapNodes.length - 1) * stepY + 200;
-  roadmap.style.minHeight = `${totalHeight}px`;
   const xLeft = centerX - 90;
   const xRight = centerX + 180;
   const yLayout = [140, 220, 300, 380, 470, 550];
@@ -1039,8 +728,6 @@ if (roadmap) {
     const x = index % 2 === 0 ? xLeft : xRight;
     const y = yLayout[index] ?? startY + index * stepY;
     const main = createNode(node, "main", { x, y });
-    main.baseX = x;
-    main.baseY = y;
     main.fixed = true;
     node.style.left = `${x}px`;
     node.style.top = `${y}px`;
@@ -1048,19 +735,14 @@ if (roadmap) {
     const offshoots = Array.from(node.querySelectorAll(".offshoot-node"));
     const isLeft = x <= centerX;
     offshoots.forEach((offshoot, offIndex) => {
-      if (!offshoot.dataset.parent) {
-        offshoot.dataset.parent = node.dataset.node || `node-${index + 1}`;
-      }
       offshoot.dataset.side = isLeft ? "left" : "right";
       roadmap.appendChild(offshoot);
       offshoot.classList.add("graph-node");
       const stackGap = 34;
       const stackHeight = (offshoots.length - 1) * stackGap;
-      const jitterX = 0;
-      const jitterY = 0;
-      const oy = y - stackHeight / 2 + offIndex * stackGap + jitterY;
+      const oy = y - stackHeight / 2 + offIndex * stackGap;
       const offsetX = isLeft ? 520 : 320;
-      const ox = isLeft ? x - offsetX + jitterX : x + offsetX + jitterX;
+      const ox = isLeft ? x - offsetX : x + offsetX;
       const sub = createNode(offshoot, "sub", { x: ox, y: oy });
       sub.parent = main;
       sub.stackIndex = offIndex;
@@ -1083,7 +765,6 @@ if (roadmap) {
   roadmap.style.minHeight = `${Math.max(520, maxY + 120)}px`;
 }
 
-let activeDrag = null;
 let lineFrame = null;
 
 const renderRoadmapLines = () => {
@@ -1131,7 +812,6 @@ const tickGraph = () => {
   if (!roadmap) return;
   const rect = roadmap.getBoundingClientRect();
   const centerX = rect.width / 2;
-  const centerY = rect.height / 2;
 
   for (let i = 0; i < graphNodes.length; i += 1) {
     for (let j = i + 1; j < graphNodes.length; j += 1) {
@@ -1177,34 +857,18 @@ const tickGraph = () => {
 
   graphNodes.forEach((node) => {
     if (node.type === "main") {
-      if (node.fixed) {
-        node.el.style.left = `${node.x}px`;
-        node.el.style.top = `${node.y}px`;
-        return;
-      }
-      node.x += (node.baseX - node.x) * 0.2;
-      node.y += (node.baseY - node.y) * 0.2;
-      node.vx *= 0.5;
-      node.vy *= 0.5;
       node.el.style.left = `${node.x}px`;
       node.el.style.top = `${node.y}px`;
       return;
     }
     if (node.fixed) return;
-    if (node.type === "sub" && node.parent) {
-      const isLeft = node.parent.x <= centerX;
-      node.el.dataset.side = isLeft ? "left" : "right";
-      const stackHeight = (node.stackCount - 1) * node.stackGap;
-      const targetY = node.parent.y - stackHeight / 2 + node.stackIndex * node.stackGap;
-      const targetX = isLeft ? node.parent.x - node.offsetX : node.parent.x + node.offsetX;
-      node.vx += (targetX - node.x) * 0.02;
-      node.vy += (targetY - node.y) * 0.02;
-    } else {
-      const cx = (centerX - node.x) * 0.0008;
-      const cy = (centerY - node.y) * 0.0008;
-      node.vx += cx;
-      node.vy += cy;
-    }
+    const isLeft = node.parent.x <= centerX;
+    node.el.dataset.side = isLeft ? "left" : "right";
+    const stackHeight = (node.stackCount - 1) * node.stackGap;
+    const targetY = node.parent.y - stackHeight / 2 + node.stackIndex * node.stackGap;
+    const targetX = isLeft ? node.parent.x - node.offsetX : node.parent.x + node.offsetX;
+    node.vx += (targetX - node.x) * 0.02;
+    node.vy += (targetY - node.y) * 0.02;
     node.vx *= 0.88;
     node.vy *= 0.88;
     node.x += node.vx;
@@ -1289,33 +953,16 @@ const bindDrag = (handle, nodeEl) => {
     dragState.node.y = event.clientY - rect.top + dragState.offsetY;
   });
 
-  handle.addEventListener("pointerup", (event) => {
+  const endDrag = (event) => {
     if (!dragState.node) return;
-    if (dragState.node.type === "main") {
-      dragState.node.fixed = true;
-      dragState.node.baseX = dragState.node.x;
-      dragState.node.baseY = dragState.node.y;
-    } else {
-      dragState.node.fixed = false;
-    }
+    dragState.node.fixed = dragState.node.type === "main";
     nodeEl.classList.remove("is-dragging");
     handle.releasePointerCapture(event.pointerId);
     dragState.node = null;
-  });
+  };
 
-  handle.addEventListener("pointercancel", (event) => {
-    if (!dragState.node) return;
-    if (dragState.node.type === "main") {
-      dragState.node.fixed = true;
-      dragState.node.baseX = dragState.node.x;
-      dragState.node.baseY = dragState.node.y;
-    } else {
-      dragState.node.fixed = false;
-    }
-    nodeEl.classList.remove("is-dragging");
-    handle.releasePointerCapture(event.pointerId);
-    dragState.node = null;
-  });
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
 };
 
 roadmapNodes.forEach((node) => {
@@ -1342,30 +989,11 @@ if (roadmap) {
   tickGraph();
 }
 
-projectTriggers.forEach((trigger) => {
-  trigger.addEventListener("click", () => {
-    openProject(trigger.dataset.project, trigger.getAttribute("aria-controls"));
-  });
-});
-
-projectWidgets.forEach((widget) => {
-  widget.addEventListener("click", () => {
-    openProject(widget.dataset.project);
-  });
-});
-
 document.addEventListener("click", (event) => {
-  const impactTrigger = event.target.closest(".impact-link");
-  if (impactTrigger) {
-    event.preventDefault();
-    openProject(impactTrigger.dataset.project, impactTrigger.getAttribute("aria-controls"));
-    return;
-  }
-  const widgetTrigger = event.target.closest(".projects-item[data-project]");
-  if (widgetTrigger) {
-    event.preventDefault();
-    openProject(widgetTrigger.dataset.project, widgetTrigger.getAttribute("aria-controls"));
-  }
+  const trigger = event.target.closest(".impact-link");
+  if (!trigger) return;
+  event.preventDefault();
+  openProject(trigger.dataset.project);
 });
 
 projectCloseButtons.forEach((button) => {

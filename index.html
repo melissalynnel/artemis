@@ -9,11 +9,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://use.typekit.net/vyy0wuq.css" />
-    <link rel="stylesheet" href="styles.css?v=20260210-39" />
+    <link rel="stylesheet" href="styles.css?v=20261016-1" />
   </head>
   <body>
     <div class="space" aria-hidden="true">
@@ -34,11 +34,8 @@
       <div class="cursor-trail"></div>
     </div>
 
-    <aside class="info-panel panel-left" data-mobile-panel="impacts">
+    <aside class="info-panel panel-left" data-mobile-panel="contact">
       <h3>Contact</h3>
-      <p>
-        <a class="meeting-button" href="https://calendly.com/melissa-levity/30min" target="_blank" rel="noreferrer">Book a Meeting</a>
-      </p>
       <p class="contact-social">
         <a class="contact-social-link" href="https://www.linkedin.com/in/melissaleavenworth/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
           <img src="assets/logos/linkedin.png" alt="LinkedIn" />
@@ -52,35 +49,40 @@
       </p>
     </aside>
 
-    <aside class="info-panel panel-right" data-mobile-panel="contact">
+    <aside class="info-panel panel-right" data-mobile-panel="impacts">
       <h3>Top Impacts</h3>
       <ul>
         <li>
-          <button class="impact-link" type="button" data-project="pipeline" aria-haspopup="dialog" aria-controls="project-modal" onclick="document.querySelectorAll('.project-modal').forEach((m)=>{m.classList.remove('is-open');m.setAttribute('aria-hidden','true');});const modal=document.getElementById('project-modal');if(modal){modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');}">
+          <button class="impact-link" type="button" data-project="pipeline" aria-haspopup="dialog" aria-controls="project-modal">
             $100M+ pipeline standardized
           </button>
         </li>
         <li>
-          <button class="impact-link" type="button" data-project="narrative" aria-haspopup="dialog" aria-controls="project-modal-narrative" onclick="document.querySelectorAll('.project-modal').forEach((m)=>{m.classList.remove('is-open');m.setAttribute('aria-hidden','true');});const modal=document.getElementById('project-modal-narrative');if(modal){modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');}">
+          <button class="impact-link" type="button" data-project="narrative" aria-haspopup="dialog" aria-controls="project-modal-narrative">
             14M+ narrative views
           </button>
         </li>
         <li>
-          <button class="impact-link" type="button" data-project="fundraising" aria-haspopup="dialog" aria-controls="project-modal-fundraising" onclick="document.querySelectorAll('.project-modal').forEach((m)=>{m.classList.remove('is-open');m.setAttribute('aria-hidden','true');});const modal=document.getElementById('project-modal-fundraising');if(modal){modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');}">
+          <button class="impact-link" type="button" data-project="fundraising" aria-haspopup="dialog" aria-controls="project-modal-fundraising">
             $9M fundraising round
+          </button>
+        </li>
+        <li>
+          <button class="impact-link" type="button" data-project="assets" aria-haspopup="dialog" aria-controls="project-modal-assets">
+            90% less filing time
           </button>
         </li>
       </ul>
     </aside>
 
     <div class="mobile-corners">
-      <button class="mobile-icon corner-tl" type="button" data-target="impacts" aria-label="Open top impacts panel">
+      <button class="mobile-icon corner-tl" type="button" data-target="contact" aria-label="Open contact panel" aria-expanded="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6" />
           <path d="M5 20a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
         </svg>
       </button>
-      <button class="mobile-icon corner-tr" type="button" data-target="contact" aria-label="Open contact panel">
+      <button class="mobile-icon corner-tr" type="button" data-target="impacts" aria-label="Open top impacts panel" aria-expanded="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="M6 4h12v2h-1.6l-1.6 3.4a4 4 0 0 1-5.6 0L7.6 6H6z"
@@ -100,37 +102,32 @@
           <path d="M8 21h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
         </svg>
       </button>
-      <button class="mobile-icon corner-bl" type="button" data-target="tech" aria-label="Open tech stack panel">
+      <button class="mobile-icon corner-bl" type="button" data-target="tech" aria-label="Open tech stack panel" aria-expanded="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6" />
           <path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
         </svg>
       </button>
-      <a
-        class="mobile-icon corner-bc"
-        href="Melissa-Leavenworth_Resume.pdf"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Download resume PDF"
-      >
+      <a class="mobile-icon corner-bc" href="Melissa-Leavenworth_CV.pdf" target="_blank" rel="noreferrer" aria-label="Open resume">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 4v10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           <path d="M8 10l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
           <path d="M6 20h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
         </svg>
       </a>
-      <button class="mobile-icon corner-br" type="button" data-target="projects" aria-label="Open projects panel">
+      <button class="mobile-icon corner-br" type="button" data-target="about" aria-label="Open about panel" aria-expanded="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 7h7l2 2h7v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
-          <path d="M4 7V6a2 2 0 0 1 2-2h5l2 2h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+          <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6" />
+          <path d="M12 11v5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          <circle cx="12" cy="7.75" r="1" fill="currentColor" />
         </svg>
       </button>
     </div>
 
-    <aside class="tech-panel tech-left" data-mobile-panel="tech" aria-expanded="false">
-      <button class="tech-toggle" type="button">
+    <aside class="tech-panel" data-mobile-panel="tech">
+      <button class="tech-toggle" type="button" aria-expanded="false">
         <span class="tech-title">Tech Stack</span>
-        <span class="tech-sub">tap to expand</span>
+        <span class="tech-sub">click to expand</span>
       </button>
       <div class="tech-grid" aria-hidden="true">
         <div class="tech-group">
@@ -156,9 +153,12 @@
               <img src="assets/logos/discord.png" alt="Discord logo" loading="lazy" />
               <span>Discord</span>
             </div>
-            <div class="tech-item">
-              <img src="assets/logos/openai.png" alt="OpenAI logo" loading="lazy" />
-              <span>Codex</span>
+            <div class="tech-item multi">
+              <div class="tech-logos">
+                <img src="assets/logos/openai.png" alt="OpenAI logo" loading="lazy" />
+                <img src="assets/logos/anthropic.png" alt="Anthropic logo" loading="lazy" />
+              </div>
+              <span>Codex + Claude Code</span>
             </div>
           </div>
         </div>
@@ -206,6 +206,10 @@
             <div class="tech-item">
               <img src="assets/logos/canva.png" alt="Canva logo" loading="lazy" />
               <span>Canva</span>
+            </div>
+            <div class="tech-item">
+              <img src="assets/logos/figma.png" alt="Figma logo" loading="lazy" />
+              <span>Figma</span>
             </div>
             <div class="tech-item">
               <img src="assets/logos/capcut.png" alt="Capcut logo" loading="lazy" />
@@ -274,22 +278,26 @@
       </div>
     </aside>
 
-    <aside class="projects-panel" data-mobile-panel="projects" aria-expanded="false">
-      <button class="projects-toggle" type="button">
-        <span class="projects-title">Projects</span>
-        <span class="projects-sub">tap to expand</span>
+    <aside class="about-panel" data-mobile-panel="about">
+      <button class="about-toggle" type="button" aria-expanded="false">
+        <span class="about-title">About</span>
+        <span class="about-sub">click to expand</span>
       </button>
-      <div class="projects-grid" aria-hidden="true">
-        <div class="projects-item highlight" data-project="pipeline" onclick="document.querySelectorAll('.project-modal').forEach((m)=>{m.classList.remove('is-open');m.setAttribute('aria-hidden','true');});const modal=document.getElementById('project-modal');if(modal){modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');}">$100M+ Pipeline</div>
-        <div class="projects-item" data-project="narrative" onclick="document.querySelectorAll('.project-modal').forEach((m)=>{m.classList.remove('is-open');m.setAttribute('aria-hidden','true');});const modal=document.getElementById('project-modal-narrative');if(modal){modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');}">14M+ Narrative Views</div>
-        <div class="projects-item" data-project="fundraising" onclick="document.querySelectorAll('.project-modal').forEach((m)=>{m.classList.remove('is-open');m.setAttribute('aria-hidden','true');});const modal=document.getElementById('project-modal-fundraising');if(modal){modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');}">$9M Fundraising Round</div>
+      <div class="about-body" aria-hidden="true">
+        <p>
+          I believe that functionality and creativity are equally important and one should never compromise the
+          presence of the other. I am an expert at taking clunky creative systems and transforming them into easily
+          usable, collaborative workflows that appease many teams at one time. I do this by evaluating all deliverables
+          and how they are created, and devising systems that easily track what everyone produces. This allows companies
+          to work better together, and create beautiful products while doing so.
+        </p>
       </div>
     </aside>
 
-    <aside class="pdf-panel" data-mobile-panel="resume">
-      <a class="pdf-download" href="Melissa-Leavenworth_Resume.pdf" target="_blank" rel="noreferrer" aria-label="Download resume PDF">
-        <span class="pdf-label">Resume</span>
-        <svg class="pdf-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <aside class="resume-panel">
+      <a class="resume-button" href="Melissa-Leavenworth_CV.pdf" target="_blank" rel="noreferrer">
+        <span class="resume-label">Resume</span>
+        <svg class="resume-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 4v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           <path d="M8 10l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           <path d="M6 20h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
@@ -297,11 +305,11 @@
       </a>
     </aside>
 
-    <div class="toggle-bar" role="tablist" aria-label="View toggle">
-      <button class="toggle-btn is-active" type="button" data-view="area" role="tab" aria-selected="true">
+    <div class="toggle-bar" role="group" aria-label="View">
+      <button class="toggle-btn is-active" type="button" data-view="area" aria-pressed="true">
         By area
       </button>
-      <button class="toggle-btn" type="button" data-view="role" role="tab" aria-selected="false">
+      <button class="toggle-btn" type="button" data-view="role" aria-pressed="false">
         By role
       </button>
     </div>
@@ -315,60 +323,61 @@
           <div class="sphere-line line-2"></div>
           <div class="sphere-text">
             <div class="hub-title-wrap">
-              <div class="hub-title adventure">Melissa Leavenworth</div>
+              <div class="hub-title">Melissa Leavenworth</div>
             </div>
             <div class="hub-sub">creativity <span class="hub-sub-emoji">🤝</span> systems</div>
           </div>
         </div>
       </div>
 
+      <div class="orbit-glow" aria-hidden="true"></div>
       <div class="orbit">
-        <button class="icon-node n1" data-tip="• Narrative + content strategy (14M+ views)\n• Joe Rogan Experience placement\n• Edited white papers + product content">
+        <button class="icon-node n1">
           <span class="icon-content">
             <span class="icon-dot"></span>
-            <span class="icon-label">Creative</span>
+            <span class="icon-label"></span>
           </span>
         </button>
-        <button class="icon-node n2" data-tip="• Built GTM systems for early-stage founders\n• Playbooks improved outreach by 66%\n• Standardized GTM across $100M+ pipeline">
+        <button class="icon-node n2">
           <span class="icon-content">
             <span class="icon-dot"></span>
-            <span class="icon-label">Marketing</span>
+            <span class="icon-label"></span>
           </span>
         </button>
-        <button class="icon-node n3" data-tip="• Cross-functional execution (20+ projects)\n• Coordinated launch ops (product, eng, PR)\n• Doubled campaign delivery speed">
+        <button class="icon-node n3">
           <span class="icon-content">
             <span class="icon-dot"></span>
-            <span class="icon-label">Sales</span>
+            <span class="icon-label"></span>
           </span>
         </button>
-        <button class="icon-node n4" data-tip="• Supported $9M fundraise (Primitive)\n• Contributed to 1.7M TVL\n• Enabled $100M+ annual revenue pipeline">
+        <button class="icon-node n4">
           <span class="icon-content">
             <span class="icon-dot"></span>
-            <span class="icon-label">Revenue</span>
+            <span class="icon-label"></span>
           </span>
         </button>
-        <button class="icon-node n5" data-tip="• Automated workflows cut coordination 35%\n• Asana system cut turnaround 66%\n• Ops efficiency up 78%">
+        <button class="icon-node n5">
           <span class="icon-content">
             <span class="icon-dot"></span>
-            <span class="icon-label">Ops</span>
+            <span class="icon-label"></span>
           </span>
         </button>
-        <button class="icon-node n6" data-tip="• Newsletters at 75%+ open rates\n• Investor-ready decks + scripts\n• Media visibility up 100%">
+        <button class="icon-node n6">
           <span class="icon-content">
             <span class="icon-dot"></span>
-            <span class="icon-label">Story</span>
+            <span class="icon-label"></span>
           </span>
         </button>
-        <button class="icon-node n7" data-tip="• Audience segmentation + positioning\n• Customer discovery (Venture programs)\n• Alignment across design/eng/sales">
+        <button class="icon-node n7">
           <span class="icon-content">
             <span class="icon-dot"></span>
-            <span class="icon-label">Insight</span>
+            <span class="icon-label"></span>
           </span>
         </button>
-        <button class="icon-node n8" data-tip="• Asset-sorting scripts cut filing 90%\n• GTM ops systems built end-to-end\n• Playbooks streamlined execution">
+        <button class="icon-node n8">
           <span class="icon-content">
             <span class="icon-dot"></span>
-            <span class="icon-label">Systems</span>
+            <span class="icon-label"></span>
           </span>
         </button>
       </div>
@@ -381,38 +390,73 @@
     <div class="project-modal" id="project-modal" data-project="pipeline" role="dialog" aria-label="Project details" aria-hidden="true">
       <div class="project-backdrop" data-project-close="true"></div>
       <div class="project-pane" role="document">
-        <button class="project-close" type="button" aria-label="Close project">X</button>
+        <button class="project-close" type="button" aria-label="Close project">×</button>
         <div class="project-header">
           <span class="project-eyebrow">Top Impact</span>
-          <h2 class="project-hero adventure">$100M+ pipeline standardized</h2>
+          <h2 class="project-hero">$100M+ pipeline standardized</h2>
+          <p class="project-company">Live.Laugh.Colorado. Real Estate Brokerage</p>
         </div>
 
         <div class="project-section">
-          <h3>Challenge</h3>
-          <p>
-            The company was scaling to nearly <strong>$100 million in annual revenue</strong> across three markets,
-            but marketing systems were fragmented and reliant on manual workflows, which made cross-team coordination
-            and performance tracking inconsistent.
-          </p>
-        </div>
+          <div class="project-glass-panel">
+            <div class="flip-grid">
+              <div class="flip-card" tabindex="0" aria-label="Challenge details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Challenge</span>
+                    <h3>Fragmented Marketing Systems</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Challenge</span>
+                    <p>
+                      The company was scaling to nearly <strong>$100 million in annual revenue</strong> across three
+                      markets, but marketing systems were fragmented and reliant on manual workflows, which made
+                      cross-team coordination and performance tracking inconsistent.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-        <div class="project-section">
-          <h3>Strategy</h3>
-          <p>
-            Built and managed Asana-based operational systems with standardized campaign templates, automated workflows,
-            and shared dashboards to unify design, content, and operations. Partnered with leadership to establish GTM
-            processes and KPI tracking that enabled scalable, repeatable execution across all markets.
-          </p>
-        </div>
+              <div class="flip-card" tabindex="0" aria-label="Strategy details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Strategy</span>
+                    <h3>Unified Asana Operations</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Strategy</span>
+                    <p>
+                      Built and managed Asana-based operational systems with standardized campaign templates, automated
+                      workflows, and shared dashboards to unify design, content, and operations. Partnered with leadership
+                      to establish GTM processes and KPI tracking that enabled scalable, repeatable execution across all
+                      markets.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-        <div class="project-section">
-          <h3>Impact</h3>
-          <p>
-            Streamlined campaign delivery cycles, improving turnaround speed by <strong>66%</strong> and campaign
-            throughput by <strong>100%</strong>. Provided real-time visibility into performance metrics, supporting a
-            <strong>30% increase in engagement and inbound leads</strong> and aligning marketing operations with
-            ~$100 M in annual sales volume.
-          </p>
+              <div class="flip-card" tabindex="0" aria-label="Impact details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Impact</span>
+                    <h3>66% Faster Turnaround</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Impact</span>
+                    <p>
+                      Streamlined campaign delivery cycles, improving turnaround speed by <strong>66%</strong> and campaign
+                      throughput by <strong>100%</strong>. Provided real-time visibility into performance metrics,
+                      supporting a <strong>30% increase in engagement and inbound leads</strong> and aligning marketing
+                      operations with ~$100 M in annual sales volume.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="project-section">
@@ -430,7 +474,6 @@
               </button>
               <div class="node-detail">The “home” table with projects that spanned Listing and Brand Marketing.</div>
               <div class="node-popover">
-                <button class="node-popover-close" type="button" aria-label="Close">×</button>
                 <p class="node-popover-title">Overarching Marketing Projects</p>
                 <p class="node-popover-desc">
                   The overarching marketing table was considered the “home” and included projects that spanned over
@@ -458,7 +501,6 @@
               </button>
               <div class="node-detail">Ongoing process projects used automations for recurring deadlines.</div>
               <div class="node-popover">
-                <button class="node-popover-close" type="button" aria-label="Close">×</button>
                 <p class="node-popover-title">Recurring Tasks</p>
                 <p class="node-popover-desc">
                   My work covered the two primary types of Asana projects. The first were ongoing process projects for
@@ -471,7 +513,7 @@
                 <p class="node-popover-desc">
                   An important part of maintaining relationships was celebrating clients at pivotal milestones. Creating
                   automations that ensured each agent was celebrated at their birthday and work-iversary was part of the
-                  Recruit, ___, Retain program so that we kept the best agents in the business under our brokerage.
+                  Recruit, Train, Retain program so that we kept the best agents in the business under our brokerage.
                 </p>
                 <div class="node-popover-grid">
                   <img src="assets/projects/pipeline/recurring-1.png" alt="Recurring tasks automation board" loading="lazy" />
@@ -491,7 +533,6 @@
               </button>
               <div class="node-detail">Deadline-driven launch projects used relational due dates per listing.</div>
               <div class="node-popover">
-                <button class="node-popover-close" type="button" aria-label="Close">×</button>
                 <p class="node-popover-title">Listing Marketing</p>
                 <p class="node-popover-desc">
                   The second type of Asana project that my work featured was deadline-driven projects with a clear end
@@ -525,7 +566,6 @@
               </button>
               <div class="node-detail">Asana forms triggered workflows for each brokerage.</div>
               <div class="node-popover">
-                <button class="node-popover-close" type="button" aria-label="Close">×</button>
                 <p class="node-popover-title">Marketing Funnels</p>
                 <p class="node-popover-desc">
                   Agents submitted their listing marketing requests via an Asana form which triggered the first set of
@@ -554,7 +594,6 @@
               </button>
               <div class="node-detail">Listings moved back and forth for relists and new media.</div>
               <div class="node-popover">
-                <button class="node-popover-close" type="button" aria-label="Close">×</button>
                 <p class="node-popover-title">Workflow Automations</p>
                 <p class="node-popover-desc">
                   Workflow automations enabled the listing to move back and forth between sections for scenarios like
@@ -582,7 +621,6 @@
               </button>
               <div class="node-detail">Simplified board that sped up new ideas.</div>
               <div class="node-popover">
-                <button class="node-popover-close" type="button" aria-label="Close">×</button>
                 <p class="node-popover-title">Experimentation</p>
                 <p class="node-popover-desc">
                   We used an incredibly simplified board to expedite fast-paced experimentation of ideas.
@@ -598,11 +636,6 @@
               </div>
             </div>
           </div>
-        <div class="project-link">
-          <a href="https://www.notion.so/Instructions-for-Asana-Listing-Marketing-Board-2a9e8228c7b780ecb8f5db9a48094ab9?pvs=21" target="_blank" rel="noreferrer">
-            Instructions for Asana Listing Marketing Board
-          </a>
-        </div>
       </div>
     </div>
     </div>
@@ -610,10 +643,11 @@
     <div class="project-modal" id="project-modal-narrative" data-project="narrative" role="dialog" aria-label="Project details" aria-hidden="true">
       <div class="project-backdrop" data-project-close="true"></div>
       <div class="project-pane" role="document">
-        <button class="project-close" type="button" aria-label="Close project">X</button>
+        <button class="project-close" type="button" aria-label="Close project">×</button>
         <div class="project-header">
           <span class="project-eyebrow">Top Impact</span>
-          <h2 class="project-hero adventure">14M+ narrative views</h2>
+          <h2 class="project-hero">14M+ narrative views</h2>
+          <p class="project-company">Internationally Known Comedian Sam Tallent</p>
         </div>
 
         <div class="project-section">
@@ -624,12 +658,12 @@
                   <div class="flip-card-face flip-card-front">
                     <span class="flip-card-kicker">Challenge</span>
                     <h3>Fragmented Presence</h3>
-                    <p>Tap to reveal details</p>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
                   </div>
                   <div class="flip-card-face flip-card-back">
-                    <h3>Challenge</h3>
+                    <span class="flip-card-kicker">Challenge</span>
                     <p>
-                      Before a major PR moment (his appearance on <em>The Joe Rogan Experience</em>), Sam’s web presence was
+                      Before a major PR moment (<a href="https://www.jrepodcast.com/episode/joe-rogan-experience-1969-sam-tallent/" target="_blank" rel="noreferrer">his appearance on <em>The Joe Rogan Experience</em></a>), Sam Tallent’s web presence was
                       fragmented and outdated.
                     </p>
                   </div>
@@ -641,10 +675,10 @@
                   <div class="flip-card-face flip-card-front">
                     <span class="flip-card-kicker">Solution</span>
                     <h3>Full Brand Rebuild</h3>
-                    <p>Tap to reveal details</p>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
                   </div>
                   <div class="flip-card-face flip-card-back">
-                    <h3>Solution</h3>
+                    <span class="flip-card-kicker">Solution</span>
                     <p>
                       Rebuilt his brand and website from the ground up, aligning visuals and tone with his darkly comedic,
                       literary persona. Integrated e-commerce and event modules to handle traffic surges.
@@ -658,12 +692,12 @@
                   <div class="flip-card-face flip-card-front">
                     <span class="flip-card-kicker">Results</span>
                     <h3>141% Traffic Growth</h3>
-                    <p>Tap to reveal details</p>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
                   </div>
                   <div class="flip-card-face flip-card-back">
-                    <h3>Results</h3>
+                    <span class="flip-card-kicker">Results</span>
                     <p>
-                      Web traffic grew <strong>141%</strong>, book sales skyrocketed ten-fold, and the rebrand helped position Sam
+                      Web traffic grew <strong>141%</strong>, book sales skyrocketed ten-fold, and the rebrand helped position Sam Tallent
                       as one of the most sought-after touring comics of the year.
                     </p>
                   </div>
@@ -671,19 +705,6 @@
               </div>
             </div>
 
-            <div class="project-link">
-              <a href="https://www.samtallent.com/" target="_blank" rel="noreferrer">
-                Visit the live site
-              </a>
-            </div>
-            <div class="project-link">
-              <a href="https://www.jrepodcast.com/episode/joe-rogan-experience-1969-sam-tallent/" target="_blank" rel="noreferrer">
-                Joe Rogan Experience #1969
-              </a>
-              <a href="https://www.jrepodcast.com/episode/joe-rogan-experience-2175-sam-tallent/" target="_blank" rel="noreferrer">
-                Joe Rogan Experience #2175
-              </a>
-            </div>
           </div>
         </div>
       </div>
@@ -692,50 +713,67 @@
     <div class="project-modal" id="project-modal-fundraising" data-project="fundraising" role="dialog" aria-label="Project details" aria-hidden="true">
       <div class="project-backdrop" data-project-close="true"></div>
       <div class="project-pane" role="document">
-        <button class="project-close" type="button" aria-label="Close project">X</button>
+        <button class="project-close" type="button" aria-label="Close project">×</button>
         <div class="project-header">
           <span class="project-eyebrow">Top Impact</span>
-          <h2 class="project-hero adventure">$9M fundraising round</h2>
+          <h2 class="project-hero">$9M fundraising round</h2>
+          <p class="project-company">Primitive.Fi Crypto AMM</p>
         </div>
 
         <div class="project-section">
           <div class="project-glass-panel">
-            <div class="project-section">
-              <h3>Challenge</h3>
-              <p>
-                Primitive, a DeFi/AMM fintech startup, needed to clarify complex technical concepts and improve credibility
-                during early-stage growth and product launch.
-              </p>
-            </div>
-
-            <div class="project-section">
-              <h3>Strategy</h3>
-              <p>
-                Partnered with founders, engineers, and product leads to craft positioning, develop GTM communication
-                playbooks, and coordinate launch operations across product, engineering, and PR. Edited and authored
-                <strong> white papers, blog posts, and technical materials</strong> to translate sophisticated AMM concepts
-                into accessible narratives.
-              </p>
-            </div>
-
-            <div class="project-section">
-              <h3>Impact</h3>
-              <p>
-                Contributed to <strong>$1.7M in TVL growth</strong>, doubled media mentions (<strong>+100%</strong>), and cut
-                revision cycles by <strong>50%</strong> through standardized stakeholder templates. Established a scalable
-                communications infrastructure that supported future launches and investor relations.
-              </p>
-            </div>
-
-            <div class="project-section">
-              <h3>Press + Content</h3>
-              <p>Placeholders below. I’ll swap in your screenshots when you’re ready.</p>
-              <div class="placeholder-grid">
-                <div class="media-placeholder">
-                  <span>Press release pickup (placeholder)</span>
+            <div class="flip-grid">
+              <div class="flip-card" tabindex="0" aria-label="Challenge details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Challenge</span>
+                    <h3>Technical Credibility Gap</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Challenge</span>
+                    <p>
+                      Primitive, a DeFi/AMM fintech startup, needed to clarify complex technical concepts and improve
+                      credibility during early-stage growth and product launch.
+                    </p>
+                  </div>
                 </div>
-                <div class="media-placeholder">
-                  <span>Technical blog edits (placeholder)</span>
+              </div>
+
+              <div class="flip-card" tabindex="0" aria-label="Strategy details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Strategy</span>
+                    <h3>Clear GTM Narrative</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Strategy</span>
+                    <p>
+                      Partnered with founders, engineers, and product leads to craft positioning, develop GTM communication
+                      playbooks, and coordinate launch operations across product, engineering, and PR. Edited and authored
+                      <strong>white papers, blog posts, and technical materials</strong> to translate sophisticated AMM
+                      concepts into accessible narratives.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flip-card" tabindex="0" aria-label="Impact details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Impact</span>
+                    <h3>$1.7M TVL Growth</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Impact</span>
+                    <p>
+                      Contributed to <strong>$1.7M in TVL growth</strong>, doubled media mentions (<strong>+100%</strong>),
+                      and cut revision cycles by <strong>50%</strong> through standardized stakeholder templates. Established
+                      a scalable communications infrastructure that supported future launches and investor relations.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -744,6 +782,78 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260210-39"></script>
+    <div class="project-modal" id="project-modal-assets" data-project="assets" role="dialog" aria-label="Project details" aria-hidden="true">
+      <div class="project-backdrop" data-project-close="true"></div>
+      <div class="project-pane" role="document">
+        <button class="project-close" type="button" aria-label="Close project">×</button>
+        <div class="project-header">
+          <span class="project-eyebrow">Top Impact</span>
+          <h2 class="project-hero">90% less filing time</h2>
+          <p class="project-company">Learning Advantage, Inc.</p>
+        </div>
+
+        <div class="project-section">
+          <div class="project-glass-panel">
+            <div class="flip-grid">
+              <div class="flip-card" tabindex="0" aria-label="Challenge details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Challenge</span>
+                    <h3>850+ Products a Year</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Challenge</span>
+                    <p>
+                      Personally photographed <strong>850+ products a year</strong>, but every image still had to be
+                      edited, named, and filed by hand, a manual, repetitive process that slowed every product rollout.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flip-card" tabindex="0" aria-label="Strategy details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Strategy</span>
+                    <h3>Automated Content Pipeline</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Strategy</span>
+                    <p>
+                      Built workflow automations linking photography, editing, and publishing, including
+                      <strong>Photoshop automations</strong> for repetitive edits. Partnered with
+                      <strong>developers</strong> to build asset-sorting scripts that filed digital assets automatically,
+                      and worked with sales and design to streamline product rollouts.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flip-card" tabindex="0" aria-label="Impact details">
+                <div class="flip-card-inner">
+                  <div class="flip-card-face flip-card-front">
+                    <span class="flip-card-kicker">Impact</span>
+                    <h3>78% More Efficient</h3>
+                    <p class="flip-card-hint"><span class="hint-hover">Hover</span><span class="hint-tap">Tap</span> to reveal details</p>
+                  </div>
+                  <div class="flip-card-face flip-card-back">
+                    <span class="flip-card-kicker">Impact</span>
+                    <p>
+                      Reduced manual filing time by <strong>90%</strong> and increased operational efficiency by
+                      <strong>78%</strong>, keeping 850+ products a year moving from photo shoot to publication without a
+                      filing backlog.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js?v=20261016-1"></script>
   </body>
 </html>
