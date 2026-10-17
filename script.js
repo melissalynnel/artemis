@@ -611,14 +611,17 @@ const closeProject = () => {
     modal.setAttribute("aria-hidden", "true");
   });
   hideNodePopovers();
+  stopGraph();
 };
 
 const openProject = (projectKey) => {
   const modal = projectModals.find((item) => item.dataset.project === projectKey);
   if (!modal) return;
   closeProject();
+  closeMobilePanels();
   modal.classList.add("is-open");
   modal.setAttribute("aria-hidden", "false");
+  if (roadmap && modal.contains(roadmap)) startGraph();
 };
 
 window.addEventListener("keydown", (event) => {
@@ -773,35 +776,20 @@ const renderRoadmapLines = () => {
   lineFrame = requestAnimationFrame(() => {
     lineFrame = null;
     const rect = roadmap.getBoundingClientRect();
-    const lines = [];
-    graphEdges.forEach((edge) => {
-      const aRect = edge.a.el.getBoundingClientRect();
-      const bRect = edge.b.el.getBoundingClientRect();
-      const kind = edge.a.type === "main" && edge.b.type === "main" ? "main" : "offshoot";
-      const aDot = edge.a.el.querySelector(".node-index");
-      const bDot = edge.b.el.querySelector(".node-index");
-      const aDotRect = aDot ? aDot.getBoundingClientRect() : aRect;
-      const bDotRect = bDot ? bDot.getBoundingClientRect() : bRect;
-
-      const x1 = aDotRect.left + aDotRect.width / 2 - rect.left;
-      const y1 = aDotRect.top + aDotRect.height / 2 - rect.top;
-      const subSide = edge.b.el.dataset.side;
-      const subDot = edge.b.el.querySelector(".sub-dot");
-      const subDotRect = subDot ? subDot.getBoundingClientRect() : bRect;
-      const x2 =
-        edge.b.type === "sub"
-          ? subDotRect.left + subDotRect.width / 2 - rect.left
-          : bDotRect.left + bDotRect.width / 2 - rect.left;
-      const y2 =
-        edge.b.type === "sub"
-          ? subDotRect.top + subDotRect.height / 2 - rect.top
-          : bDotRect.top + bDotRect.height / 2 - rect.top;
-
-      lines.push({ x1, y1, x2, y2, kind });
-    });
+    // Lines connect the dots (numbered index on boards, sub-dot on offshoots), relative to the roadmap.
+    const dotCenter = (el) => {
+      const dot = el.querySelector(".node-index, .sub-dot") || el;
+      const r = dot.getBoundingClientRect();
+      return [r.left + r.width / 2 - rect.left, r.top + r.height / 2 - rect.top];
+    };
     roadmapLines.setAttribute("viewBox", `0 0 ${rect.width} ${rect.height}`);
-    roadmapLines.innerHTML = lines
-      .map((line) => `<line class="${line.kind}" x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}" />`)
+    roadmapLines.innerHTML = graphEdges
+      .map(({ a, b }) => {
+        const [x1, y1] = dotCenter(a.el);
+        const [x2, y2] = dotCenter(b.el);
+        const kind = a.type === "main" && b.type === "main" ? "main" : "offshoot";
+        return `<line class="${kind}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`;
+      })
       .join("");
   });
 };
@@ -880,7 +868,23 @@ const tickGraph = () => {
   });
 
   renderRoadmapLines();
-  requestAnimationFrame(tickGraph);
+};
+
+// The physics only runs while the roadmap's project modal is open (started/stopped by openProject/closeProject).
+let graphFrame = null;
+
+const startGraph = () => {
+  if (!roadmap || graphFrame) return;
+  const loop = () => {
+    tickGraph();
+    graphFrame = requestAnimationFrame(loop);
+  };
+  loop();
+};
+
+const stopGraph = () => {
+  cancelAnimationFrame(graphFrame);
+  graphFrame = null;
 };
 
 let glitchContext = null;
@@ -982,12 +986,6 @@ clickTargets.forEach((target) => {
   });
 });
 
-window.addEventListener("resize", renderRoadmapLines);
-window.addEventListener("scroll", renderRoadmapLines, { passive: true });
-renderRoadmapLines();
-if (roadmap) {
-  tickGraph();
-}
 
 document.addEventListener("click", (event) => {
   const trigger = event.target.closest(".impact-link");
